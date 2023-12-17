@@ -20,7 +20,7 @@ struct ContentView: View {
     @State private var wholeEquation: String = ""
     @State private var equations: [String] = []
     func action(valuePressed: String) -> Void {
-//        CLEAR
+        //        CLEAR
         if valuePressed == "AC" {
             displayText = "0"
             storedValue = 0
@@ -28,24 +28,29 @@ struct ContentView: View {
             wholeEquation = ""
             return
         }
-        if ["+","-","x","÷", "%"].contains(valuePressed) {
+        if valuePressed == "%" {
+            storedValue = Double(displayText)! / 100
+            displayText = String(Double(displayText)! / 100)
+            return
+        }
+        if ["+","-","x","÷"].contains(valuePressed) {
             if wholeEquation.rangeOfCharacter(from: CharacterSet.decimalDigits) == nil {
                 return
             }
             currentOperator = valuePressed
             storedValue = storedValue! + Double(displayText)!
-
+            
             displayText = "0"
         }
         wholeEquation = wholeEquation + valuePressed
         
         formatter.minimumFractionDigits = 0
         formatter.numberStyle = .decimal
-
-
-//        HANDLE NUMBER
+        
+        
+        //        HANDLE NUMBER
         if ["1","2","3","4","5","6","7","8","9","0","." ].contains(valuePressed) {
-//            Handle if no value already
+            //            Handle if no value already
             if displayText == "0"{
                 displayText = valuePressed
             }
@@ -55,19 +60,19 @@ struct ContentView: View {
             else if valuePressed == "." {
                 if displayText == "0" {
                     displayText = "0."
-
+                    
                 }
                 else {
                     displayText = displayText + "."
                 }
             }
             else{
-//                Handle add to end of number
+                //                Handle add to end of number
                 displayText = displayText + valuePressed
             }
         }
         else if valuePressed == "+/-" {
-
+            
             if displayText.starts(with: "-") {
                 displayText = String(displayText.dropFirst())
             }
@@ -80,18 +85,18 @@ struct ContentView: View {
                 
                 let result = (formatter.string(from: ( storedValue! + Double(displayText)!) as NSNumber) ?? "n/a")
                 wholeEquation = wholeEquation + result
-
+                
                 displayText = result
             }
             else if currentOperator == "-" {
                 let result = (formatter.string(from: ( storedValue! - Double(displayText)!) as NSNumber) ?? "n/a")
                 wholeEquation = wholeEquation + result
-
+                
                 displayText = result
             }      else if currentOperator == "x" {
                 let result = (formatter.string(from: ( storedValue! * Double(displayText)!) as NSNumber) ?? "n/a")
                 wholeEquation = wholeEquation + result
-
+                
                 displayText = result
                 
             }      else if currentOperator == "÷" {
@@ -117,21 +122,31 @@ struct ContentView: View {
                 .textSelection(.enabled)
             Spacer()
             
-            ScrollView {
-                
-                Text(wholeEquation).font(.system(size: 25)).multilineTextAlignment(.trailing).frame(maxWidth: .infinity)
+            //            ScrollView {
+            
+            Text(wholeEquation).font(.system(size: 25)).multilineTextAlignment(.trailing).frame(maxWidth: .infinity)
+                .padding()
+                .textSelection(.enabled)
+            NavigationStack {
+                List($equations , id:\.self,
+                     editActions: .delete
+                ){equation in
+                    ForEach(equations, id: \.self) { equation in
+                        Text(equation)
+                            .textSelection(.enabled)
+                        
+                    }
+                    .font(.system(size: 25))
+                    .multilineTextAlignment(.trailing).frame(maxWidth: .infinity)
                     .padding()
                     .textSelection(.enabled)
-                ForEach(equations, id:\.self){equation in
-                    Text(equation).font(.system(size: 25)).multilineTextAlignment(.trailing).frame(maxWidth: .infinity)
-                        .padding()
-                        .textSelection(.enabled)
                 }
-            }.background(.gray)
+                //            }.background(.gray)
+            }
             Spacer()
-
+            
             VStack(alignment: .leading, spacing: 5) {
-                CalculatorButtonRow(buttons: ["AC","+/-","%","÷"], action: action)
+                CalculatorButtonRow(buttons: ["AC","+/-","÷"], action: action)
                 CalculatorButtonRow(buttons: ["7","8","9","x"], action: action)
                 CalculatorButtonRow(buttons: ["4","5","6","-"], action: action)
                 CalculatorButtonRow(buttons: ["1","2","3","+"], action: action)
@@ -158,13 +173,13 @@ struct CalcButton: View {
     }
     
     private func buttonSize(type: String) -> CGFloat {
-        if buttonLabel == "0" && type == "width" {
-            return ((UIScreen.main.bounds.width - 5 * 12) / 2)
+        if  ["0", "AC"].contains(buttonLabel) && type == "width" {
+            return ((UIScreen.main.bounds.width - 5 * 12) / 2)+13.5
         }
         return ((UIScreen.main.bounds.width - 5 * 12) / 4)
     }
     
-
+    
     
     var body: some View {
         Button(action: {
@@ -175,7 +190,7 @@ struct CalcButton: View {
                 .frame(width: buttonSize(type: "width"), height: buttonSize(type: "height"))
                 .background(buttonColor())
                 .foregroundColor(.white)
-                .cornerRadius(buttonSize(type: "width"))
+                .cornerRadius(buttonSize(type: "width")).padding(3)
         }
     }
 }
@@ -183,7 +198,7 @@ struct CalcButton: View {
 struct CalculatorButtonRow: View {
     let buttons:[String]
     let action:  (String) -> Void
-
+    
     var body: some View {
         
         HStack() {
