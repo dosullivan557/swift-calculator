@@ -28,7 +28,17 @@ struct ContentView: View {
             wholeEquation = ""
             return
         }
+        if ["+","-","x","÷", "%"].contains(valuePressed) {
+            if wholeEquation.rangeOfCharacter(from: CharacterSet.decimalDigits) == nil {
+                return
+            }
+            currentOperator = valuePressed
+            storedValue = storedValue! + Double(displayText)!
+
+            displayText = "0"
+        }
         wholeEquation = wholeEquation + valuePressed
+        
         formatter.minimumFractionDigits = 0
         formatter.numberStyle = .decimal
 
@@ -55,12 +65,6 @@ struct ContentView: View {
 //                Handle add to end of number
                 displayText = displayText + valuePressed
             }
-        }
-        else if ["+","-","x","÷"].contains(valuePressed) {
-            currentOperator = valuePressed
-            storedValue = storedValue! + Double(displayText)!
-
-            displayText = "0"
         }
         else if valuePressed == "+/-" {
 
