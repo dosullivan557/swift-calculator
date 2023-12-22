@@ -28,7 +28,9 @@ struct HistoryView: View {
                 .multilineTextAlignment(.trailing).frame(maxWidth: .infinity)
                 .padding()
                 .textSelection(.enabled)
-            }
+            }.navigationTitle("History")
+                .navigationBarTitleDisplayMode(.inline)
+            
             
         }
     }
