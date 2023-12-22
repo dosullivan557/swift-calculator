@@ -1,104 +1,22 @@
 //
-//  ContentView.swift
+//  calulator_page.swift
 //  calculator
 //
-//  Created by Danny on 16/12/2023.
+//  Created by Danny on 21/12/2023.
 //
 
-import SwiftUI
-import UIKit
 import Foundation
-
-let numberFormatter = NumberFormatter()
-let formatter = NumberFormatter()
+import SwiftUI
 
 struct ContentView: View {
-    @State private var equations: [String] = []
-
-    var body: some View {
-        TabView {
-            CalculatorView(equations: $equations)
-                .tabItem {
-                    Label("Calculator", systemImage: "square.and.pencil.circle")
-                }
-            
-            HistoryView(equations: $equations)
-                .tabItem {
-                    Label("History", systemImage: "clock.fill")
-                }
-        }
-    }
-}
-
-
-struct CalcButton: View {
-    let buttonLabel: String
-    let action:  (String) -> Void
-    let color: Color = .gray
-    private func buttonColor() -> Color {
-        if ["=", "+", "-", "x","÷"].contains(buttonLabel) {
-            return .orange
-        } else if ["+/-", "%", "AC"].contains(buttonLabel) {
-            return .blue
-        }
-        return .gray
-    }
     
-    
-    private func buttonSize(type: String) -> CGFloat {
-        if type == "width" {
-            if  ["0", "AC"].contains(buttonLabel) && type == "width" {
-                return ((UIScreen.main.bounds.width - 5 * 12) / 2)+13.5
-            }
-            return ((UIScreen.main.bounds.width - 5 * 12) / 4)
-        }
-        if  ["0", "AC"].contains(buttonLabel) && type == "width" {
-            return ((UIScreen.main.bounds.width - 10 * 12) / 2)+13.5
-        }
-        return ((UIScreen.main.bounds.width - 10 * 12) / 4)
-        
-    }
-    
-    
-    
-    var body: some View {
-        Button(action: {
-            action(buttonLabel)
-        }) {
-            Text(buttonLabel)
-                .font(.title)
-                .frame(width: buttonSize(type: "width"), height: buttonSize(type: "height"))
-                .background(buttonColor())
-                .foregroundColor(.white)
-                .cornerRadius(buttonSize(type: "width")).padding(3)
-                .bold()
-        }
-    }
-}
-
-struct CalculatorButtonRow: View {
-    let buttons:[String]
-    let action:  (String) -> Void
-    
-    var body: some View {
-        
-        HStack() {
-            ForEach(buttons, id:\.self){buttonLabel in
-                CalcButton(buttonLabel:buttonLabel, action: action)
-                
-            }
-        }
-    }
-}
-
-struct CalculatorView: View {
     @State private var displayText = "0"
     @State private var currentInput = ""
     @State private var storedValue: Double? = 0
     @State private var currentOperator: String?
     @State private var wholeEquation: String = ""
-    @Binding var equations: [String]
-
+    @State private var equations: [String] = []
+    
     func action(valuePressed: String) -> Void {
         //        CLEAR
         if valuePressed == "AC" {
@@ -208,25 +126,27 @@ struct CalculatorView: View {
             Text(wholeEquation).font(.system(size: 25)).multilineTextAlignment(.trailing).frame(maxWidth: .infinity)
                 .padding()
                 .textSelection(.enabled)
-//            NavigationStack {
-//                List($equations , id:\.self,
-//                     editActions: .delete
-//                ){equation in
-//                    ForEach(equations, id: \.self) { equation in
-//                        Text(equation)
-//                            .textSelection(.enabled)
-//                        
-//                    }
-//                    .font(.system(size: 25))
-//                    .multilineTextAlignment(.trailing).frame(maxWidth: .infinity)
-//                    .padding()
-//                    .textSelection(.enabled)
-//                }
-//
-//            }
-            //            Spacer()
+            NavigationStack {
+                List($equations , id:\.self,
+                     editActions: .delete
+                ){equation in
+                    ForEach(equations, id: \.self) { equation in
+                        Text(equation)
+                            .textSelection(.enabled)
+                        
+                    }
+                    .font(.system(size: 25))
+                    .multilineTextAlignment(.trailing).frame(maxWidth: .infinity)
+                    .padding()
+                    .textSelection(.enabled)
+                }
+                
+                
+                
+            }
+            Spacer()
             
-            VStack(alignment: .center ) {
+            VStack(alignment: .leading, spacing: 5) {
                 CalculatorButtonRow(buttons: ["AC","+/-","÷"], action: action)
                 CalculatorButtonRow(buttons: ["7","8","9","x"], action: action)
                 CalculatorButtonRow(buttons: ["4","5","6","-"], action: action)
@@ -234,35 +154,11 @@ struct CalculatorView: View {
                 CalculatorButtonRow(buttons: ["0",".","="], action: action)
                 
             }
-        }
-        
-    }
-    
-    
-}
-
-struct HistoryView: View {
-    @Binding var equations: [String]
-
-    // Content for the second tab
-    var body: some View {
-        NavigationStack {
-            List {
-                ForEach(equations, id: \.self) { equation in
-                    Text(equation)
-                        .textSelection(.enabled)
-                        .font(.system(size: 25))
-                        .multilineTextAlignment(.trailing)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                }
-            }
+            .frame(maxHeight: .infinity)
+            .padding()
+            
+            
         }
     }
-}
-
-
-
-#Preview {
-    ContentView()
+    
 }
